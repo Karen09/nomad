@@ -1,6 +1,17 @@
 [Unit]
 Description=Nomad
 Documentation=https://nomadproject.io/docs/
+Requires=network-online.target
+After=network-online.target
 
 [Service]
-ExecStart=/usr/bin/nomad agent -config /etc/nomad
+EnvironmentFile=-/etc/sysconfig/nomad
+Restart=on-failure
+ExecStart=/usr/bin/nomad agent -config=/etc/nomad
+ExecReload=/bin/kill -HUP $MAINPID
+KillSignal=SIGINT
+RestartSec=42s
+LimitNOFILE=131072
+
+[Install]
+WantedBy=multi-user.target
